@@ -1,0 +1,62 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Model files
+models/
+*.bin
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+
+# Data files
+data/
+*.db
+*.sqlite
+
+# Logs
+logs/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes
+volumes/
+
+# SSL certificates
+ssl/
+*.pem
+*.key
+*.crt
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Temporary files
+tmp/
+temp/
+*.tmp
