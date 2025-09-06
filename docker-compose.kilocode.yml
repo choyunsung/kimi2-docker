@@ -1,0 +1,116 @@
+version: '3.8'
+
+# Kilo Code와 통합을 위한 특별 설정
+services:
+  kimi-k2-kilocode:
+    build: .
+    container_name: kimi-k2-kilocode
+    ports:
+      - "8000:8000"  # Kilo Code 연결용
+      - "8001:8001"  # 메트릭 모니터링
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      # Kilo Code 최적화 설정
+      - MODEL_NAME=moonshot-ai/kimi-k2-instruct
+      - MAX_MODEL_LEN=16384  # Kilo Code에 적합한 중간 크기
+      - TENSOR_PARALLEL_SIZE=1
+      - GPU_MEMORY_UTILIZATION=0.90
+      - MAX_NUM_SEQS=5  # 동시 Kilo Code 세션 수
+      
+      # API 설정
+      - API_KEY=${API_KEY:-kilocode-secret-key}
+      - ENABLE_CORS=true
+      - CORS_ORIGINS=*
+      
+      # 성능 최적화
+      - ENABLE_PREFIX_CACHING=true
+      - ENABLE_CHUNKED_PREFILL=true
+      - BLOCK_SIZE=16
+      
+      # 로깅
+      - LOG_LEVEL=INFO
+      - LOG_FILE=/app/logs/kimi-k2.log
+      
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+        limits:
+          memory: 128G
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - kilocode-network
+
+  # 로드 밸런서 (여러 VS Code 인스턴스 지원)
+  nginx-kilocode:
+    image: nginx:alpine
+    container_name: kimi-nginx-kilocode
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-kilocode.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - kimi-k2-kilocode
+    networks:
+      - kilocode-network
+    restart: unless-stopped
+
+  # Prometheus 모니터링 (선택사항)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: kimi-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - kilocode-network
+    restart: unless-stopped
+
+  # Grafana 대시보드 (선택사항)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: kimi-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=redis-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    networks:
+      - kilocode-network
+    restart: unless-stopped
+
+networks:
+  kilocode-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  prometheus_data:
+  grafana_data:

@@ -1,0 +1,139 @@
+{
+  // Kilo Code + Kimi-K2 통합 설정
+  "kilocode.customModels": [
+    {
+      "id": "kimi-k2-local",
+      "name": "Kimi-K2 (Local Docker)",
+      "provider": "openai",
+      "baseUrl": "http://localhost:8000/v1",
+      "apiKey": "your-api-key-here",
+      "model": "kimi-k2",
+      "maxTokens": 32768,
+      "temperature": 0.7,
+      "contextLength": 128000,
+      "capabilities": {
+        "vision": false,
+        "functionCalling": true,
+        "streaming": true
+      }
+    },
+    {
+      "id": "kimi-k2-local-fast",
+      "name": "Kimi-K2 Fast (8K Context)",
+      "provider": "openai", 
+      "baseUrl": "http://localhost:8000/v1",
+      "apiKey": "your-api-key-here",
+      "model": "kimi-k2",
+      "maxTokens": 8192,
+      "temperature": 0.5,
+      "contextLength": 8192,
+      "capabilities": {
+        "vision": false,
+        "functionCalling": true,
+        "streaming": true
+      }
+    }
+  ],
+  
+  // 기본 모델 설정
+  "kilocode.defaultModel": "kimi-k2-local",
+  
+  // 모드별 모델 설정
+  "kilocode.modes": {
+    "architect": {
+      "model": "kimi-k2-local",
+      "systemPrompt": "당신은 시스템 아키텍트입니다. 확장 가능하고 유지보수가 쉬운 설계를 제안하세요. 한국어로 답변해주세요.",
+      "temperature": 0.3
+    },
+    "coder": {
+      "model": "kimi-k2-local-fast",
+      "systemPrompt": "당신은 전문 개발자입니다. 깔끔하고 효율적인 코드를 작성하세요. 코드 주석은 한국어로 작성해주세요.",
+      "temperature": 0.5
+    },
+    "debugger": {
+      "model": "kimi-k2-local",
+      "systemPrompt": "당신은 디버깅 전문가입니다. 버그를 찾고 해결책을 제시하세요. 설명은 한국어로 해주세요.",
+      "temperature": 0.2
+    }
+  },
+  
+  // 자동 완성 설정
+  "kilocode.autocomplete": {
+    "enabled": true,
+    "model": "kimi-k2-local-fast",
+    "debounceDelay": 500,
+    "maxSuggestions": 3,
+    "contextLines": 30,
+    "triggerCharacters": [".", "(", "{", "[", " "],
+    "languages": ["javascript", "typescript", "python", "java", "go", "rust"]
+  },
+  
+  // 커밋 메시지 자동 생성
+  "kilocode.assistedCommits": {
+    "enabled": true,
+    "model": "kimi-k2-local-fast",
+    "language": "korean",
+    "conventionalCommits": true,
+    "includeScope": true,
+    "maxLength": 72,
+    "template": "{{type}}({{scope}}): {{subject}}\n\n{{body}}"
+  },
+  
+  // 성능 설정
+  "kilocode.performance": {
+    "cacheResponses": true,
+    "cacheDuration": 3600,
+    "cacheSize": 100,
+    "streamResponses": true,
+    "timeout": 60000,
+    "retryAttempts": 3,
+    "retryDelay": 1000
+  },
+  
+  // UI 설정
+  "kilocode.ui": {
+    "showStatusBar": true,
+    "showNotifications": true,
+    "notificationDuration": 5000,
+    "theme": "dark",
+    "fontSize": 14
+  },
+  
+  // 보안 설정
+  "kilocode.security": {
+    "sanitizeApiKeys": true,
+    "excludePatterns": [
+      "**/.env",
+      "**/.env.*",
+      "**/secrets.*",
+      "**/credentials.*"
+    ],
+    "warnOnSensitiveData": true
+  },
+  
+  // 로깅 설정
+  "kilocode.logging": {
+    "enabled": true,
+    "level": "info",
+    "logFile": ".kilocode/logs/kilocode.log",
+    "maxFileSize": "10MB",
+    "maxFiles": 5
+  },
+  
+  // 단축키 설정
+  "kilocode.keybindings": {
+    "generateCode": "ctrl+shift+g",
+    "refactorCode": "ctrl+shift+r",
+    "debugCode": "ctrl+shift+d",
+    "explainCode": "ctrl+shift+e",
+    "commitMessage": "ctrl+shift+c"
+  },
+  
+  // 실험적 기능
+  "kilocode.experimental": {
+    "enableMCPServers": true,
+    "enableVoiceInput": false,
+    "enableCodeReview": true,
+    "enableTestGeneration": true
+  }
+}

@@ -181,6 +181,29 @@ docker-compose down -v
 docker rmi kimi2-docker_kimi-k2
 ```
 
+## Kilo Code 통합
+
+이 프로젝트는 [Kilo Code](https://github.com/Kilo-Org/kilocode) VS Code 확장과 완벽하게 통합됩니다.
+
+### Kilo Code 연동 설정
+
+1. **전용 Docker Compose 실행**:
+```bash
+docker-compose -f docker-compose.kilocode.yml up -d
+```
+
+2. **VS Code 설정**:
+```bash
+# 제공된 설정 파일을 VS Code 설정 디렉토리로 복사
+cp vscode-settings.json ~/.config/Code/User/settings.json
+```
+
+3. **Kilo Code 확장 설치**:
+- VS Code Extensions에서 "Kilo Code" 검색 및 설치
+- 자동으로 로컬 Kimi-K2 서버와 연결됨
+
+자세한 통합 가이드는 [kilocode-integration.md](./kilocode-integration.md) 참조
+
 ## 라이선스
 
 이 프로젝트는 Kimi-K2 모델의 라이선스 조건을 따릅니다. 상업적 사용 시 원본 라이선스를 확인하세요.
@@ -188,5 +211,6 @@ docker rmi kimi2-docker_kimi-k2
 ## 참고 자료
 
 - [Kimi-K2 GitHub](https://github.com/choyunsung/Kimi-K2)
+- [Kilo Code](https://github.com/Kilo-Org/kilocode)
 - [vLLM Documentation](https://docs.vllm.ai/)
 - [OpenAI API Reference](https://platform.openai.com/docs/api-reference)
